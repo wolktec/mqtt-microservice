@@ -4,6 +4,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "A simple microservice communication lib using MQTT",
+  "files": [
+    "dist/**/*"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/examples/example.ts",
