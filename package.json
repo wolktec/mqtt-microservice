@@ -1,0 +1,27 @@
+{
+  "name": "mqtt-microservice",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "A simple microservice communication lib using MQTT",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/examples/example.ts",
+    "build": "rm -rf dist && tsc"
+  },
+  "dependencies": {
+    "mqtt": "^5.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "ts-node-dev": "^2.0.0"
+  },
+  "peerDependencies": {
+    "mqtt": "^5.10.0"
+  }
+}

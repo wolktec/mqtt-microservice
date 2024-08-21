@@ -1,0 +1,6 @@
+services:
+  emqx:
+    container_name: emqx
+    image: emqx/emqx
+    ports:
+      - "1883:1883"
