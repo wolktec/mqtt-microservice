@@ -1,6 +1,7 @@
 export interface Message<T> {
     correlationId: string;
-    payload: T;
+    payload?: T;
+    error?: Error;
 }
 export type AwaitingResponse<T> = Record<string, {
     resolve: (value: T) => void;

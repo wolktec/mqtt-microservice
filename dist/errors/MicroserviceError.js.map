@@ -1,0 +1,1 @@
+{"version":3,"file":"MicroserviceError.js","sourceRoot":"","sources":["../../src/errors/MicroserviceError.ts"],"names":[],"mappings":";;;AAAA,MAAa,iBAAkB,SAAQ,KAAK;IAC1C,YAAY,OAAe,EAAE,IAAY,EAAE,KAAc;QACvD,KAAK,CAAC,OAAO,CAAC,CAAC;QACf,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;IACrB,CAAC;CACF;AAND,8CAMC"}

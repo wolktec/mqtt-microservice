@@ -1,29 +1,53 @@
 import { createConnection, createMicroservice } from "../index";
 
-const microservice = async () => {
-  await createMicroservice(
-    { url: "mqtt://localhost", name: "example" },
-    {
-      hello: async (args: { name: string }) => {
-        return `Hello, ${args.name}`;
-      },
+class NotImplementedError extends Error {}
+
+const microservice = createMicroservice(
+  {
+    url: "mqtt://localhost",
+    name: "example",
+    errorHandler: (error) => {
+      return {
+        message: 'Teste',
+        name: 'Erro',
+        stack: error.stack
+      }
     }
-  );
-};
+  },
+  {
+    hello: async (args: { name: string }) => {
+      throw new NotImplementedError();
+    },
+    world: async (args: { name: string }) => {
+      const { name } = args;
+      return `Hello ${name}`;
+    },
+  }
+);
 
 const client = async () => {
-  const conn = await createConnection({
+  const { conn, request } = await createConnection({
     url: "mqtt://localhost",
   });
 
-  const response = await conn.request<string>("example/hello", {
-    name: "world",
-  });
-  console.log(response);
+  await request<string>("example/world", {
+      name: "world",
+    })
+    .then(console.log)
+    .catch(console.error);
+
+  await request<string>("example/hello", {
+      name: "world",
+    })
+    .then(console.log)
+    .catch(console.error);
+
+  await conn.endAsync();
+  await (await microservice).endAsync();
 };
 
 const run = async () => {
-  await microservice();
+  await microservice;
   await client();
 };
 

@@ -28,8 +28,9 @@ const default_1 = require("../default");
  */
 const createMicroservice = (config, resolvers) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
-    const name = config.name;
+    const { name, errorHandler } = config;
     const conn = yield mqtt_1.default.connectAsync(config.url);
+    const responseTopic = config.responseTopic || default_1.DEFAULT_RESPONSE_TOPIC;
     try {
         for (var _d = true, _e = __asyncValues(Object.keys(resolvers)), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
             _c = _f.value;
@@ -52,13 +53,28 @@ const createMicroservice = (config, resolvers) => __awaiter(void 0, void 0, void
         if (!resolver) {
             return;
         }
-        const result = yield resolver(payload);
-        const responseTopic = config.responseTopic || default_1.DEFAULT_RESPONSE_TOPIC;
-        const response = {
-            correlationId,
-            payload: result
-        };
-        conn.publish(`${responseTopic}/${correlationId}`, JSON.stringify(response));
+        try {
+            const result = yield resolver(payload);
+            const response = {
+                correlationId,
+                payload: result
+            };
+            conn.publish(`${responseTopic}/${correlationId}`, JSON.stringify(response));
+        }
+        catch (error) {
+            const e = errorHandler ? errorHandler(error) : error;
+            const { name, message, stack } = e;
+            error = {
+                name,
+                message,
+                stack
+            };
+            const response = {
+                correlationId,
+                error
+            };
+            conn.publish(`${responseTopic}/${correlationId}`, JSON.stringify(response));
+        }
     }));
     return conn;
 });

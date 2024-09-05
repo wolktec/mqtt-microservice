@@ -30,7 +30,10 @@ const request = (conn, awaitingResponse, timeoutTime = 5000) => (topic, payload)
                 clearTimeout(timeout);
                 resolve(value);
             },
-            reject,
+            reject: (error) => {
+                clearTimeout(timeout);
+                reject(error);
+            }
         };
     });
     conn.publish(topic, JSON.stringify(message));

@@ -1,9 +1,15 @@
 import mqtt from "mqtt";
 export type MicroserviceResolver = Record<string, (args: any) => Promise<any> | any>;
+export type ErrorHandler = (e: any) => Error;
 export interface MicroserviceConfig {
     url: string;
     name: string;
     responseTopic?: string;
+    /**
+     * This error handler just maps the error to a more readable error
+     * @returns {Error} An error message with the name, message and stack properties
+     */
+    errorHandler?: ErrorHandler;
 }
 /**
  * Creates a new microservice

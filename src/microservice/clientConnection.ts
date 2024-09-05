@@ -2,6 +2,7 @@ import mqtt, { MqttClient } from "mqtt"
 import request from "./requestMicroservice"
 import { AwaitingResponse, Message } from "../internalTypes"
 import { DEFAULT_RESPONSE_TOPIC } from "../default"
+import { MicroserviceError } from "../errors/MicroserviceError"
 
 export interface ClientConnectionConfig {
     url: string,
@@ -21,8 +22,14 @@ const createConnection = async (config: ClientConnectionConfig): Promise<ClientC
     conn.subscribeAsync(`${config.responseTopic || DEFAULT_RESPONSE_TOPIC}/#`)
 
     conn.on("message", (topic, message) => {
-        const { correlationId, payload } = JSON.parse(message.toString()) as Message<any>
+        const { correlationId, payload, error } = JSON.parse(message.toString()) as Message<any>
         if (awaitingResponses[correlationId]) {
+            if(error) {
+                const { name, message, stack } = error
+                awaitingResponses[correlationId].reject(new MicroserviceError(name, message, stack))
+                delete awaitingResponses[correlationId]
+                return
+            }
             awaitingResponses[correlationId].resolve(payload)
             delete awaitingResponses[correlationId]
         }

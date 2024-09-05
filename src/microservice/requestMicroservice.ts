@@ -30,7 +30,10 @@ const request =
           clearTimeout(timeout);
           resolve(value);
         },
-        reject,
+        reject: (error: any) => {
+          clearTimeout(timeout);
+          reject(error);
+        }
       };
     });
 

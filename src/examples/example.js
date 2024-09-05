@@ -1,10 +1,26 @@
 const { createConnection, createMicroservice } = require("../../dist/index");
 
+class NotImplementedError extends Error {}
+
 const microservice = createMicroservice(
-  { url: "mqtt://localhost", name: "example" },
+  { 
+    url: "mqtt://localhost", 
+    name: "example",
+    errorHandler: (error) => {
+      return {
+        message: 'Teste',
+        name: 'Erro',
+        stack: error.stack
+      }
+    }
+  },
   {
     hello: async (args) => {
-      return `Hello, ${args.name}`;
+      throw new NotImplementedError(name);
+    },
+    world: async (args) => {
+      const { name } = args;
+      return `Hello ${name}`;
     },
   }
 );
@@ -14,12 +30,20 @@ const client = async () => {
     url: "mqtt://localhost",
   });
 
-  const response = await request("example/hello", {
+  await request("example/world", {
     name: "world",
-  });
-  console.log(response);
+  })
+    .then(console.log)
+    .catch(console.error);
+
+  await request("example/hello", {
+    name: "world",
+  })
+    .then(console.log)
+    .catch(console.error);
+
   await conn.endAsync();
-  (await microservice).endAsync();
+  await (await microservice).endAsync();
 };
 
 const run = async () => {

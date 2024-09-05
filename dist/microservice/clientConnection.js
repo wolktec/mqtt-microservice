@@ -15,13 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mqtt_1 = __importDefault(require("mqtt"));
 const requestMicroservice_1 = __importDefault(require("./requestMicroservice"));
 const default_1 = require("../default");
+const MicroserviceError_1 = require("../errors/MicroserviceError");
 const createConnection = (config) => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield mqtt_1.default.connectAsync(config.url);
     const awaitingResponses = {};
     conn.subscribeAsync(`${config.responseTopic || default_1.DEFAULT_RESPONSE_TOPIC}/#`);
     conn.on("message", (topic, message) => {
-        const { correlationId, payload } = JSON.parse(message.toString());
+        const { correlationId, payload, error } = JSON.parse(message.toString());
         if (awaitingResponses[correlationId]) {
+            if (error) {
+                const { name, message, stack } = error;
+                awaitingResponses[correlationId].reject(new MicroserviceError_1.MicroserviceError(name, message, stack));
+                delete awaitingResponses[correlationId];
+                return;
+            }
             awaitingResponses[correlationId].resolve(payload);
             delete awaitingResponses[correlationId];
         }
